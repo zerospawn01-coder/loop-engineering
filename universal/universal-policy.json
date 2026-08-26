@@ -1,0 +1,36 @@
+{
+  "policy_id": "LE-UNIVERSAL-v0",
+  "layer": "UNIVERSAL",
+  "controls": {
+    "goal_required": true,
+    "current_state_required": true,
+    "primary_hypothesis": {
+      "required": true,
+      "cardinality": 1
+    },
+    "scope_control": {
+      "required": true
+    },
+    "evidence": {
+      "required_for_pass": true
+    },
+    "no_false_pass": true,
+    "stop_conditions": {
+      "required": true
+    },
+    "verdicts": [
+      "PASS",
+      "FAIL",
+      "HOLD",
+      "BLOCKED"
+    ],
+    "next_issue": {
+      "proposal_only": true,
+      "automatic_execution": false
+    },
+    "human_authority": {
+      "agent_may_assume": false,
+      "agent_may_fabricate_approval": false
+    }
+  }
+}
