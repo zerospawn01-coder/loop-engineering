@@ -119,6 +119,22 @@ def gate_05() -> None:
     }
     expect_violation(frozen_upper, frozen_expansion)
 
+    escape_upper = {
+        **UPPER,
+        "restrictive": {
+            **UPPER["restrictive"],
+            "scope": ["scripts/aether/**"],
+        },
+    }
+    for escape_scope in (
+        "scripts/aether/../secrets/**",
+        "scripts/aether/biosynthesis/../../secrets/**",
+    ):
+        expect_violation(
+            escape_upper,
+            {"restrictive": {"scope": [escape_scope]}},
+        )
+
 
 def gate_06() -> None:
     lower = {"restrictive": {"agent_authority": ["analyze", "merge"]}}
