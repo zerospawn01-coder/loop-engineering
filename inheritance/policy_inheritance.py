@@ -75,6 +75,11 @@ def _merge_additive(
 
 
 def _validate_scope_entry(value: str, label: str) -> None:
+    if any(segment in (".", "..") for segment in value.split("/")):
+        raise PolicyInheritanceViolation(
+            f"{label} contains forbidden dot segment: {value}"
+        )
+
     wildcard_chars = ("*", "?", "[", "]")
     if not any(char in value for char in wildcard_chars):
         return
