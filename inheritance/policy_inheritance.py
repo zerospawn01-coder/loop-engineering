@@ -74,11 +74,63 @@ def _merge_additive(
     return resolved
 
 
+def _validate_scope_entry(value: str, label: str) -> None:
+    wildcard_chars = ("*", "?", "[", "]")
+    if not any(char in value for char in wildcard_chars):
+        return
+    if value.endswith("/**") and not any(
+        char in value[:-3] for char in wildcard_chars
+    ):
+        return
+    raise PolicyInheritanceViolation(
+        f"{label} uses unsupported scope pattern: {value}"
+    )
+
+
+def _scope_entry_within(lower: str, upper: str) -> bool:
+    if lower == upper:
+        return True
+    if upper.endswith("/**"):
+        upper_base = upper[:-3].rstrip("/")
+        return lower == upper_base or lower.startswith(f"{upper_base}/")
+    return False
+
+
+def _merge_scope(upper: dict[str, Any], lower: dict[str, Any]) -> list[str]:
+    upper_values = _require_string_list(
+        upper.get("scope", []), "upper.restrictive.scope"
+    )
+    for value in upper_values:
+        _validate_scope_entry(value, "upper.restrictive.scope")
+
+    if "scope" not in lower:
+        return list(upper_values)
+
+    lower_values = _require_string_list(
+        lower["scope"], "lower.restrictive.scope"
+    )
+    for value in lower_values:
+        _validate_scope_entry(value, "lower.restrictive.scope")
+
+    outside = [
+        value
+        for value in lower_values
+        if not any(
+            _scope_entry_within(value, upper_value) for upper_value in upper_values
+        )
+    ]
+    if outside:
+        raise PolicyInheritanceViolation(
+            f"lower.restrictive.scope expands upper policy: {sorted(outside)}"
+        )
+    return list(lower_values)
+
+
 def _merge_restrictive(
     upper: dict[str, Any], lower: dict[str, Any]
 ) -> dict[str, list[str]]:
-    resolved: dict[str, list[str]] = {}
-    for field in RESTRICTIVE_FIELDS:
+    resolved: dict[str, list[str]] = {"scope": _merge_scope(upper, lower)}
+    for field in ("allowed_actions", "agent_authority"):
         upper_values = _require_string_list(
             upper.get(field, []), f"upper.restrictive.{field}"
         )
