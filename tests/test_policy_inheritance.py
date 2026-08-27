@@ -83,10 +83,41 @@ def gate_04() -> None:
     resolved = resolve_policy_inheritance(UPPER, lower)
     assert resolved["restrictive"] == lower["restrictive"]
 
+    frozen_upper = {
+        **UPPER,
+        "restrictive": {
+            **UPPER["restrictive"],
+            "scope": ["scripts/aether/**"],
+        },
+    }
+    frozen_lower = {
+        "restrictive": {
+            "scope": ["scripts/aether/biosynthesis/**"],
+        }
+    }
+    resolved = resolve_policy_inheritance(frozen_upper, frozen_lower)
+    assert resolved["restrictive"]["scope"] == [
+        "scripts/aether/biosynthesis/**"
+    ]
+
 
 def gate_05() -> None:
     lower = {"restrictive": {"scope": ["src", "tests", "secrets"]}}
     expect_violation(UPPER, lower)
+
+    frozen_upper = {
+        **UPPER,
+        "restrictive": {
+            **UPPER["restrictive"],
+            "scope": ["scripts/aether/biosynthesis/**"],
+        },
+    }
+    frozen_expansion = {
+        "restrictive": {
+            "scope": ["scripts/**"],
+        }
+    }
+    expect_violation(frozen_upper, frozen_expansion)
 
 
 def gate_06() -> None:
