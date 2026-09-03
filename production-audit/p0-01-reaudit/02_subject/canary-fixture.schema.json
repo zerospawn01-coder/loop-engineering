@@ -1,0 +1,306 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:loop-engineering:p0:canary-fixture:v1",
+  "title": "LE Auditor Canary Fixture",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "fixture_id",
+    "profile",
+    "fixture_class",
+    "inputs",
+    "scope",
+    "expected"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "LE-CANARY-FIXTURE-v1"
+    },
+    "fixture_id": {
+      "type": "string",
+      "pattern": "^CAN-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_id",
+        "profile_version"
+      ],
+      "properties": {
+        "profile_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "profile_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "fixture_class": {
+      "enum": [
+        "POSITIVE",
+        "NEGATIVE",
+        "AMBIGUOUS"
+      ]
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "normative_revision",
+        "normative_files",
+        "subject_revision",
+        "subject_files",
+        "evidence_state",
+        "evidence_files"
+      ],
+      "properties": {
+        "normative_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "normative_files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/file_ref"
+          }
+        },
+        "subject_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subject_files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/file_ref"
+          }
+        },
+        "evidence_state": {
+          "enum": [
+            "COMPLETE",
+            "PARTIAL",
+            "NONE"
+          ]
+        },
+        "evidence_files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/file_ref"
+          }
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "in_scope",
+        "out_of_scope"
+      ],
+      "properties": {
+        "in_scope": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "out_of_scope": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "audit_status",
+        "required_attack_lenses",
+        "required_normative_references"
+      ],
+      "properties": {
+        "audit_status": {
+          "enum": [
+            "COUNTEREXAMPLE_FOUND",
+            "NO_COUNTEREXAMPLE_FOUND",
+            "INCONCLUSIVE"
+          ]
+        },
+        "required_attack_lenses": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/attack_lens"
+          }
+        },
+        "required_normative_references": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "file_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[A-Fa-f0-9]{64}$"
+        }
+      }
+    },
+    "attack_lens": {
+      "enum": [
+        "CHECK-01_POLICY_DILUTION",
+        "CHECK-02_SEMANTIC_DRIFT",
+        "CHECK-03_EVIDENCELESS_CLAIM",
+        "CHECK-04_CIRCULAR_VALIDATION",
+        "CHECK-05_SHADOW_ALIASING",
+        "CHECK-06_SCOPE_LEAKAGE",
+        "CHECK-07_STOP_BYPASS"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "fixture_class": {
+            "const": "POSITIVE"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "expected": {
+            "properties": {
+              "audit_status": {
+                "const": "COUNTEREXAMPLE_FOUND"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "fixture_class": {
+            "const": "NEGATIVE"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "expected": {
+            "properties": {
+              "audit_status": {
+                "const": "NO_COUNTEREXAMPLE_FOUND"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "fixture_class": {
+            "const": "AMBIGUOUS"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "expected": {
+            "properties": {
+              "audit_status": {
+                "const": "INCONCLUSIVE"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "inputs": {
+            "properties": {
+              "evidence_state": {
+                "const": "NONE"
+              }
+            },
+            "required": [
+              "evidence_state"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "inputs": {
+            "properties": {
+              "evidence_files": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "inputs": {
+            "properties": {
+              "evidence_state": {
+                "const": "COMPLETE"
+              }
+            },
+            "required": [
+              "evidence_state"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "inputs": {
+            "properties": {
+              "evidence_files": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
