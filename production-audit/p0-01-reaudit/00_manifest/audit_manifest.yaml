@@ -1,0 +1,34 @@
+audit_manifest:
+  bundle_version: "P0-01-REAUDIT-BUNDLE-v1"
+  audit_target: "P0-01 Canary Fixture Contract"
+  auditor_version: "LE-Adversarial-Auditor-v1.1"
+  repository: "zerospawn01-coder/loop-engineering"
+  branch: "feat/p0-01-canary-fixture-contract"
+  source_revision: "0cb9a6a846a78af60febe6ca411611c27dfb37db"
+  normative_revision: "sha256:0e0e1ab07d97ec297b0a65c78e140d54468ea33081c6ee9b2ec098ca281133ee"
+  evidence:
+    run_id: "6337a269-417a-447d-a147-3df77e8f0d64"
+    tested_source_revision: "0cb9a6a846a78af60febe6ca411611c27dfb37db"
+    process_exit_code: 0
+    gate_result: "12/12 PASS"
+    positive_valid_fixtures: "6/6 PASS"
+  source_binding:
+    required_relation: "source_revision == tested_source_revision"
+    status: "MATCH"
+  subject_git_blobs:
+    - file: "02_subject/canary-fixture.schema.json"
+      git_blob_sha1: "623f8c07f21d0fda1fe156ea2a66f02888610471"
+    - file: "02_subject/auditor-result.schema.json"
+      git_blob_sha1: "12b6ee827e3d4ab0125cf16f62565d07ec4453d2"
+  per_file_sha256:
+    - file: "01_normative/P0-01_CANARY_FIXTURE_CONTRACT.md"
+      sha256: "0e0e1ab07d97ec297b0a65c78e140d54468ea33081c6ee9b2ec098ca281133ee"
+    - file: "02_subject/canary-fixture.schema.json"
+      sha256: "6b448ddefa01b9a3f2878184418ca4351ee2d7db512698c5caaea1f90d6cb751"
+    - file: "02_subject/auditor-result.schema.json"
+      sha256: "95a260d12c1306419653ae5a1d08d2d7a3b031a9d7156a0ff2e7bd61bc662809"
+    - file: "03_evidence/p0-01_gate_output.txt"
+      sha256: "3f96c73c14f8525c01b75c261c9ca44d42869c96b0f67b4d3818eb47ec5ac912"
+    - file: "04_scope/audit_scope.md"
+      sha256: "caba9925a84aa969516da8b57a646fa5ba1d4554396878bcb1a14094182c22b3"
+  integrity_status: "HASH_VERIFIED_EXTERNALLY"
