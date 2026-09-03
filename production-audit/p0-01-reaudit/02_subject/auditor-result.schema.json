@@ -1,0 +1,302 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:loop-engineering:p0:auditor-result:v1",
+  "title": "LE Adversarial Auditor Canary Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "fixture_id",
+    "profile",
+    "audit_status",
+    "audit_target",
+    "observations",
+    "evidence_gaps",
+    "scope_observations",
+    "authority"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "LE-AUDITOR-RESULT-v1"
+    },
+    "fixture_id": {
+      "type": "string",
+      "pattern": "^CAN-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_id",
+        "profile_version"
+      ],
+      "properties": {
+        "profile_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "profile_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "audit_status": {
+      "enum": [
+        "COUNTEREXAMPLE_FOUND",
+        "NO_COUNTEREXAMPLE_FOUND",
+        "INCONCLUSIVE"
+      ]
+    },
+    "audit_target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "normative_revision",
+        "subject_revision",
+        "manifest_status"
+      ],
+      "properties": {
+        "normative_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subject_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "manifest_status": {
+          "enum": [
+            "RECEIVED",
+            "HASH_VERIFIED_EXTERNALLY",
+            "MISMATCH",
+            "NOT_PROVIDED"
+          ]
+        }
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/observation"
+      }
+    },
+    "evidence_gaps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence_gap"
+      }
+    },
+    "scope_observations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/scope_observation"
+      }
+    },
+    "authority": {
+      "description": "Self-declared structured compliance fields emitted by the Auditor. These fields are not independent proof that the raw Auditor output contains no authority violation. Independent verification belongs to the external qualification pipeline.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonical_verdict_claimed",
+        "canonical_verdict_value",
+        "improvement_proposal_present"
+      ],
+      "properties": {
+        "canonical_verdict_claimed": {
+          "description": "Auditor self-declaration only; externally verified in a later qualification stage.",
+          "const": false
+        },
+        "canonical_verdict_value": {
+          "type": "null"
+        },
+        "improvement_proposal_present": {
+          "description": "Auditor self-declaration only; externally verified in a later qualification stage.",
+          "const": false
+        }
+      }
+    }
+  },
+  "$defs": {
+    "attack_lens": {
+      "enum": [
+        "CHECK-01_POLICY_DILUTION",
+        "CHECK-02_SEMANTIC_DRIFT",
+        "CHECK-03_EVIDENCELESS_CLAIM",
+        "CHECK-04_CIRCULAR_VALIDATION",
+        "CHECK-05_SHADOW_ALIASING",
+        "CHECK-06_SCOPE_LEAKAGE",
+        "CHECK-07_STOP_BYPASS"
+      ]
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observation_id",
+        "target",
+        "normative_references",
+        "attack_lenses",
+        "candidate_counterexample"
+      ],
+      "properties": {
+        "observation_id": {
+          "type": "string",
+          "pattern": "^OBS-[0-9]{3,}$"
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "normative_references": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "attack_lenses": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/attack_lens"
+          }
+        },
+        "candidate_counterexample": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "trace",
+            "observed_conflict"
+          ],
+          "properties": {
+            "trace": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "observed_conflict": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "evidence_gap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim",
+        "required_by",
+        "missing_evidence",
+        "effect_on_audit"
+      ],
+      "properties": {
+        "claim": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "missing_evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "effect_on_audit": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "scope_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "item",
+        "reason"
+      ],
+      "properties": {
+        "item": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "audit_status": {
+            "const": "COUNTEREXAMPLE_FOUND"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "observations": {
+            "minItems": 1
+          },
+          "evidence_gaps": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "audit_status": {
+            "const": "NO_COUNTEREXAMPLE_FOUND"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "observations": {
+            "maxItems": 0
+          },
+          "evidence_gaps": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "audit_status": {
+            "const": "INCONCLUSIVE"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "observations": {
+            "maxItems": 0
+          },
+          "evidence_gaps": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}
