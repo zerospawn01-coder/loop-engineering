@@ -1,0 +1,31 @@
+P0-01 RE-AUDIT EVIDENCE
+SOURCE_REVISION: 0cb9a6a846a78af60febe6ca411611c27dfb37db
+TESTED_SOURCE_REVISION: 0cb9a6a846a78af60febe6ca411611c27dfb37db
+SOURCE_BINDING: MATCH
+CANARY_FIXTURE_GIT_BLOB_SHA1: 623f8c07f21d0fda1fe156ea2a66f02888610471
+AUDITOR_RESULT_GIT_BLOB_SHA1: 12b6ee827e3d4ab0125cf16f62565d07ec4453d2
+LOCAL_COPY_GIT_BLOB_MATCH: TRUE
+COMMAND: python /mnt/data/p0_01_gate_runner.py
+
+P0-01 DETERMINISTIC VERIFICATION
+PYTHON_VERSION: 3.13.5
+JSONSCHEMA_VERSION: 4.26.0
+FIXTURE_SCHEMA: /mnt/data/p0-01-reaudit/02_subject/canary-fixture.schema.json
+RESULT_SCHEMA: /mnt/data/p0-01-reaudit/02_subject/auditor-result.schema.json
+
+P0-01-GATE-01 PASS: both schemas are valid Draft 2020-12 schemas
+P0-01-GATE-02 PASS: unknown top-level/nested properties rejected
+P0-01-GATE-03 PASS: malformed SHA-256 rejected
+P0-01-GATE-04 PASS: POSITIVE + NO_COUNTEREXAMPLE_FOUND rejected
+P0-01-GATE-05 PASS: NEGATIVE + COUNTEREXAMPLE_FOUND rejected
+P0-01-GATE-06 PASS: COUNTEREXAMPLE_FOUND + observations=[] rejected
+P0-01-GATE-07 PASS: INCONCLUSIVE + evidence_gaps=[] rejected
+P0-01-GATE-08 PASS: authority declaration violations rejected
+P0-01-GATE-09 PASS: evidence_state=NONE + non-empty evidence_files rejected
+P0-01-GATE-10 PASS: evidence_state=COMPLETE + evidence_files=[] rejected
+P0-01-GATE-11 PASS: INCONCLUSIVE + observations non-empty rejected
+P0-01-GATE-12 PASS: COUNTEREXAMPLE_FOUND + evidence_gaps non-empty rejected
+POSITIVE VALID FIXTURES PASS: 6/6 accepted
+
+P0-01 RESULT: 12/12 GATES PASS
+PROCESS_EXIT_CODE: 0
